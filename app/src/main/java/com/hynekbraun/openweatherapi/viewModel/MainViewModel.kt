@@ -1,6 +1,5 @@
 package com.hynekbraun.openweatherapi.viewModel
 
-import android.provider.SyncStateContract
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +26,21 @@ class MainViewModel : ViewModel() {
             try {
                 val weather = withContext(Dispatchers.IO) {
                     dataRepository.getWeather("weather?q=$city&units=${Constants.UNIT_METRIC}&appid=${Constants.KEY}")
+                }
+                weatherLiveData.value = weather
+            } catch (e: HttpException) {
+                error.value = "$e"
+
+            } catch (e: Exception) {
+                error.value = "$e"
+            }
+        }
+    }
+    fun fetchWeatherByLocation(lat: Double, lon: Double){
+        viewModelScope.launch {
+            try {
+                val weather = withContext(Dispatchers.IO) {
+                    dataRepository.getWeather("weather?lat=$lat&lon=$lon&units=${Constants.UNIT_METRIC}&appid=${Constants.KEY}")
 
                 }
                 weatherLiveData.value = weather
@@ -35,9 +49,7 @@ class MainViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 error.value = "$e"
-
             }
         }
-
     }
 }
