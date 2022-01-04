@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">OpenWeatherAPI</string>
+    <string name="condition_icon">Condition Icon</string>
 </resources>

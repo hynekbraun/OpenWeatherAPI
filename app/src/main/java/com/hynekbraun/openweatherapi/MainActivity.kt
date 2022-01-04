@@ -2,19 +2,19 @@ package com.hynekbraun.openweatherapi
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import coil.Coil
+import coil.load
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.hynekbraun.openweatherapi.databinding.ActivityMainBinding
@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         binding.mainTvHumidity.text = "Humidity :  ${currentWeather.main.humidity}"
         binding.mainTvWindSpeed.text = "Wind Speed: ${currentWeather.wind.speed}"
         binding.mainTvPressure.text = "Pressure: ${currentWeather.main.pressure}"
+        binding.mainIvImage.load("http://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png")
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -89,21 +90,7 @@ class MainActivity : AppCompatActivity() {
         return formatter.format(date)
     }
 
-    private fun checkForNetwork(): Boolean {
-        fun isNetworkConnected(): Boolean {
-            //1
-            val connectivityManager =
-                getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            //2
-            val activeNetwork = connectivityManager.activeNetwork
-            //3
-            val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-            //4
-            return networkCapabilities != null &&
-                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        }
-        return isNetworkConnected()
-    }
+
 
     private fun roundTemp(temp: Double): String {
         val df = DecimalFormat("#")
@@ -146,14 +133,15 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 0 && grantResults.isNotEmpty()) {
-            for (i in grantResults.indices) {
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                }
-            }
+        getWeatherByLocation()
 
-            getWeatherByLocation()
-        }
+//        if (requestCode == 0 && grantResults.isNotEmpty()) {
+//            for (i in grantResults.indices) {
+//                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+//                }
+//            }
+//
+//        }
     }
 
     @SuppressLint("MissingPermission")
@@ -162,9 +150,7 @@ class MainActivity : AppCompatActivity() {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location ->
                     // getting the last known or current location
-                    binding.mainTvTemperature.text = location.latitude.toString()
                     viewModel.fetchWeatherByLocation(location.latitude, location.longitude)
-
                 }
                 .addOnFailureListener {
                     Toast.makeText(
@@ -181,7 +167,25 @@ class MainActivity : AppCompatActivity() {
             return false
         } else {
             return true
-
         }
+    }
+    private fun checkForNetwork(): Boolean {
+        fun isNetworkConnected(): Boolean {
+            //1
+            val connectivityManager =
+                getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            //2
+            val activeNetwork = connectivityManager.activeNetwork
+            //3
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+            //4
+            return networkCapabilities != null &&
+                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }
+        if (!isNetworkConnected()){
+            Toast.makeText(this, "Problem with internet", Toast.LENGTH_SHORT).show()
+        }
+        return isNetworkConnected()
+
     }
 }

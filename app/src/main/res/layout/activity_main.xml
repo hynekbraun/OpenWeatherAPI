@@ -57,8 +57,8 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/main_tv_temperature"
             android:layout_toEndOf="@id/main_tv_temperature"
-            android:textSize="30sp"
-            android:text="/" />
+            android:text="/"
+            android:textSize="30sp" />
 
         <TextView
             android:id="@+id/main_tv_feelsLike"
@@ -80,15 +80,28 @@
         app:layout_constraintTop_toBottomOf="@id/main_rl_layout"
         tools:text="Condition" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/main_rv_forecast"
-        android:layout_width="0dp"
+    <ImageView
+        android:id="@+id/main_iv_image"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/condition_icon"
+        android:scaleType="centerCrop"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/main_tv_condition" />
+        app:layout_constraintTop_toBottomOf="@id/main_tv_condition" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/main_rv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/main_ll_bottom"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_iv_image" />
 
     <LinearLayout
+        android:id="@+id/main_ll_bottom"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -119,14 +132,7 @@
             tools:text="Pressure" />
 
 
-
-
-
-
-
-
-
-
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
