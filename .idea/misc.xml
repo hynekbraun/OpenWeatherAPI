@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/drawable/main_background.xml" value="0.2140625" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/forecast_item.xml" value="0.35572916666666665" />
       </map>
     </option>
   </component>

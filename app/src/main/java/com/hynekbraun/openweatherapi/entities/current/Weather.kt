@@ -1,4 +1,4 @@
-package com.hynekbraun.openweatherapi.entities
+package com.hynekbraun.openweatherapi.entities.current
 
 data class Weather(
     val description: String,

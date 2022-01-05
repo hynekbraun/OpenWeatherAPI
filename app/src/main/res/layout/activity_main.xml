@@ -31,7 +31,7 @@
         android:id="@+id/main_tv_last_update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="last updated"
+        tools:text="last updated"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/main_btn_submit" />
@@ -52,6 +52,7 @@
             tools:text="2" />
 
         <TextView
+            android:visibility="invisible"
             android:id="@+id/main_tv_slash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

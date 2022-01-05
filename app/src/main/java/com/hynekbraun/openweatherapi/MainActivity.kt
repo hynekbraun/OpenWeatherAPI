@@ -9,16 +9,18 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
-import coil.Coil
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.hynekbraun.openweatherapi.databinding.ActivityMainBinding
-import com.hynekbraun.openweatherapi.entities.CurrentWeatherEntity
+import com.hynekbraun.openweatherapi.entities.current.CurrentWeatherEntity
+import com.hynekbraun.openweatherapi.util.ForecastAdapter
 import com.hynekbraun.openweatherapi.viewModel.MainViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val adapter: ForecastAdapter by lazy { ForecastAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +40,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-
+        binding.mainRv.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.mainRv.adapter = adapter
 
         requestPermission()
-
-//        viewModel.fetchWeather()
         viewModel.error.observe(this) {
             if (it.isNotEmpty()) {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
@@ -50,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.weatherLiveData.observe(this) {
             updateUI(it)
+        }
+        viewModel.forecastLiveData.observe(this) {
+            adapter.getForecast(it)
         }
 
         binding.mainBtnSubmit.setOnClickListener {
@@ -61,6 +66,7 @@ class MainActivity : AppCompatActivity() {
                         .show()
                 } else {
                     viewModel.fetchWeather(binding.mainEtCity.text.toString())
+                    viewModel.getForecast(binding.mainEtCity.text.toString())
                 }
             } else {
                 AlertDialog.Builder(this).setTitle("No Internet Connection")
@@ -73,33 +79,18 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(currentWeather: CurrentWeatherEntity) {
-        binding.mainTvLastUpdate.text = getCurrentTime()
-        binding.mainTvTemperature.text = roundTemp(currentWeather.main.temp) + "°C"
-        binding.mainTvFeelsLike.text = roundTemp(currentWeather.main.feels_like) + "°C"
+        binding.mainTvLastUpdate.text = viewModel.getCurrentTime()
+        binding.mainTvTemperature.text = viewModel.roundTemp(currentWeather.main.temp) + "°C"
+        binding.mainTvFeelsLike.text = viewModel.roundTemp(currentWeather.main.feels_like) + "°C"
         binding.mainTvCondition.text = currentWeather.weather[0].description
         binding.mainTvHumidity.text = "Humidity :  ${currentWeather.main.humidity}"
         binding.mainTvWindSpeed.text = "Wind Speed: ${currentWeather.wind.speed}"
         binding.mainTvPressure.text = "Pressure: ${currentWeather.main.pressure}"
         binding.mainIvImage.load("http://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png")
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun getCurrentTime(): String {
-        val date = Calendar.getInstance().time
-        val formatter = SimpleDateFormat("EEE, hh:mm")
-        return formatter.format(date)
-    }
-
-
-
-    private fun roundTemp(temp: Double): String {
-        val df = DecimalFormat("#")
-        df.roundingMode = RoundingMode.CEILING
-        return df.format(temp)
+        binding.mainTvSlash.visibility = View.VISIBLE
     }
 
     private fun requestPermission() {
-
         //create val that will hold all the permissions that the user hasn agreed to yet
         val permissionsToRequest = mutableListOf<String>()
         //ask for each permision seperate and if they were not granted, add them to the list with requests that we need user to agree to
@@ -134,14 +125,6 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         getWeatherByLocation()
-
-//        if (requestCode == 0 && grantResults.isNotEmpty()) {
-//            for (i in grantResults.indices) {
-//                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-//                }
-//            }
-//
-//        }
     }
 
     @SuppressLint("MissingPermission")
@@ -151,6 +134,7 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { location ->
                     // getting the last known or current location
                     viewModel.fetchWeatherByLocation(location.latitude, location.longitude)
+                    viewModel.fetchForecastByLocation(location.latitude, location.longitude)
                 }
                 .addOnFailureListener {
                     Toast.makeText(
@@ -169,6 +153,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
     }
+
     private fun checkForNetwork(): Boolean {
         fun isNetworkConnected(): Boolean {
             //1
@@ -182,10 +167,9 @@ class MainActivity : AppCompatActivity() {
             return networkCapabilities != null &&
                     networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         }
-        if (!isNetworkConnected()){
+        if (!isNetworkConnected()) {
             Toast.makeText(this, "Problem with internet", Toast.LENGTH_SHORT).show()
         }
         return isNetworkConnected()
-
     }
 }
