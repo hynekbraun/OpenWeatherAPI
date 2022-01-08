@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:background="#0D000000"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/fc_item_tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        tools:text="20/11/2020" />
+
+    <ImageView
+        android:id="@+id/fc_item_iv_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/fc_item_tv_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        tools:text="30 / 20" />
+
+    <TextView
+        android:id="@+id/fc_item_tv_condition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        tools:text="Rainy" />
+</LinearLayout>

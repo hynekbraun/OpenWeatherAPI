@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">OpenWeatherAPI</string>
     <string name="condition_icon">Condition Icon</string>
+    <string name="city">City</string>
+    <string name="submit">submit</string>
+    <string name="slash">/</string>
 </resources>
